@@ -2,19 +2,16 @@ use crate::monomers::DnaNucleotide;
 use crate::monomers::Monomer;
 use crate::monomers::Nucleotide;
 use crate::monomers::RnaNucleotide;
+
 use core::hash::Hash;
 use std::collections::HashMap;
 
-//-------------------------------------- DNA -----------------------------------------//
+//------------------------------------ POLYMER ---------------------------------------//
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub struct Polymer<M: Monomer> {
     monomers: Vec<M>,
 }
-
-pub type Dna = Polymer<DnaNucleotide>;
-
-pub type Rna = Polymer<RnaNucleotide>;
 
 impl<M: Monomer> Polymer<M> {
     pub fn new(symbols: &str, monomer: fn(char) -> Option<M>) -> Option<Self> {
@@ -124,6 +121,8 @@ impl<M: Monomer> Polymer<M> {
     }
 }
 
+//---------------------------------- NUCLEIC ACID ------------------------------------//
+
 impl<N: Nucleotide> Polymer<N> {
     pub fn gc_content(&self) -> f32 {
         let count = self.monomers.iter().filter(|n| n.is_gc()).count() as f32;
@@ -136,12 +135,20 @@ impl<N: Nucleotide> Polymer<N> {
     }
 }
 
+//-------------------------------------- DNA -----------------------------------------//
+
+pub type Dna = Polymer<DnaNucleotide>;
+
 impl Dna {
     pub fn transcribe(&self) -> Rna {
         let monomers = self.monomers.iter().map(|n| n.transcribe()).collect();
         Polymer { monomers }
     }
 }
+
+//-------------------------------------- RNA -----------------------------------------//
+
+pub type Rna = Polymer<RnaNucleotide>;
 
 impl Rna {
     pub fn untranscribe(&self) -> Dna {
