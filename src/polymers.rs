@@ -1,14 +1,15 @@
+use crate::monomers::AminoAcid;
+use crate::monomers::Codon;
 use crate::monomers::DnaNucleotide;
 use crate::monomers::Monomer;
 use crate::monomers::Nucleotide;
 use crate::monomers::RnaNucleotide;
-
 use core::hash::Hash;
 use std::collections::HashMap;
 
 //------------------------------------ POLYMER ---------------------------------------//
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Ord, PartialOrd)]
 pub struct Polymer<M: Monomer> {
     monomers: Vec<M>,
 }
@@ -88,7 +89,7 @@ impl<M: Monomer> Polymer<M> {
             .enumerate()
             .min_by_key(|p| p.1.monomers.len())
             .unwrap();
-        for size in (1..shortest.monomers.len() + 1).rev() {
+        for size in (1..=shortest.monomers.len()).rev() {
             for motif in shortest.monomers.windows(size) {
                 let mut shared = true;
                 for (i, polymer) in polymers.iter().enumerate() {
@@ -124,13 +125,18 @@ impl<M: Monomer> Polymer<M> {
 //---------------------------------- NUCLEIC ACID ------------------------------------//
 
 impl<N: Nucleotide> Polymer<N> {
-    pub fn gc_content(&self) -> f32 {
-        let count = self.monomers.iter().filter(|n| n.is_gc()).count() as f32;
-        let length = self.monomers.len() as f32;
+    pub fn gc_content(&self) -> f64 {
+        let count = self.monomers.iter().filter(|n| n.is_gc()).count() as f64;
+        let length = self.monomers.len() as f64;
         count * 100.0 / length
     }
     pub fn reverse_complement(&self) -> Polymer<N> {
-        let monomers = self.monomers.iter().rev().map(|n| n.complement()).collect();
+        let monomers = self
+            .monomers
+            .iter()
+            .rev()
+            .map(Nucleotide::complement)
+            .collect();
         Polymer { monomers }
     }
 }
@@ -141,7 +147,11 @@ pub type Dna = Polymer<DnaNucleotide>;
 
 impl Dna {
     pub fn transcribe(&self) -> Rna {
-        let monomers = self.monomers.iter().map(|n| n.transcribe()).collect();
+        let monomers = self
+            .monomers
+            .iter()
+            .map(DnaNucleotide::transcribe)
+            .collect();
         Polymer { monomers }
     }
 }
@@ -152,7 +162,48 @@ pub type Rna = Polymer<RnaNucleotide>;
 
 impl Rna {
     pub fn untranscribe(&self) -> Dna {
-        let monomers = self.monomers.iter().map(|n| n.untranscribe()).collect();
+        let monomers = self
+            .monomers
+            .iter()
+            .map(RnaNucleotide::untranscribe)
+            .collect();
         Polymer { monomers }
+    }
+    pub fn translate(&self) -> Vec<Protein> {
+        let mut candidates: Vec<Vec<AminoAcid>> = Vec::new();
+        let mut translations: Vec<Vec<AminoAcid>> = Vec::new();
+        for chunk in self.monomers.chunks(3).filter(|c| c.len() == 3) {
+            let codon = Codon(chunk[0], chunk[1], chunk[2]);
+            let aminoacid = codon.aminoacid();
+            match aminoacid {
+                Some(a) => {
+                    if a.is_start() {
+                        candidates.push(Vec::new());
+                    }
+                    for canidate in &mut candidates {
+                        canidate.push(a);
+                    }
+                }
+                None => {
+                    translations.append(&mut candidates);
+                }
+            }
+        }
+        translations
+            .iter()
+            .map(|t| Polymer {
+                monomers: t.to_vec(),
+            })
+            .collect()
+    }
+}
+
+//------------------------------------ PROTEIN ---------------------------------------//
+
+pub type Protein = Polymer<AminoAcid>;
+
+impl Protein {
+    pub fn mass(&self) -> f64 {
+        self.monomers.iter().map(AminoAcid::mass).sum()
     }
 }
