@@ -9,7 +9,7 @@ use std::collections::HashMap;
 
 //------------------------------------ POLYMER ---------------------------------------//
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Ord, PartialOrd)]
+#[derive(PartialEq, Eq, Hash, Clone, Ord, PartialOrd, Debug)]
 pub struct Polymer<M: Monomer> {
     monomers: Vec<M>,
 }

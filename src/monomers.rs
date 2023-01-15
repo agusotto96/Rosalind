@@ -3,7 +3,7 @@ use core::hash::Hash;
 
 //------------------------------------ MONOMER ---------------------------------------//
 
-pub trait Monomer: Sized + PartialEq + Eq + Hash + Copy + Clone + Debug + Ord + PartialOrd {
+pub trait Monomer: Sized + PartialEq + Eq + Hash + Copy + Clone + Ord + PartialOrd + Debug {
     fn new(symbol: char) -> Option<Self>;
 }
 
@@ -16,7 +16,7 @@ pub trait Nucleotide: Monomer {
 
 //--------------------------------- DNA NUCLEOTIDE -----------------------------------//
 
-#[derive(Debug, PartialEq, Eq, Hash, Copy, Clone, Ord, PartialOrd)]
+#[derive(PartialEq, Eq, Hash, Copy, Clone, Ord, PartialOrd, Debug)]
 pub enum DnaNucleotide {
     Adenine,
     Cytosine,
@@ -63,7 +63,7 @@ impl DnaNucleotide {
 
 //--------------------------------- RNA NUCLEOTIDE -----------------------------------//
 
-#[derive(Debug, PartialEq, Eq, Hash, Copy, Clone, Ord, PartialOrd)]
+#[derive(PartialEq, Eq, Hash, Copy, Clone, Ord, PartialOrd, Debug)]
 pub enum RnaNucleotide {
     Adenine,
     Cytosine,
@@ -110,7 +110,7 @@ impl RnaNucleotide {
 
 //----------------------------------- AMINO ACID -------------------------------------//
 
-#[derive(Debug, PartialEq, Eq, Hash, Copy, Clone, Ord, PartialOrd)]
+#[derive(PartialEq, Eq, Hash, Copy, Clone, Ord, PartialOrd, Debug)]
 pub enum AminoAcid {
     Alanine,
     Cysteine,
