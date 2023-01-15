@@ -170,8 +170,8 @@ impl Rna {
         Polymer { monomers }
     }
     pub fn translate(&self) -> Vec<Protein> {
-        let mut candidates: Vec<Vec<AminoAcid>> = Vec::new();
-        let mut translations: Vec<Vec<AminoAcid>> = Vec::new();
+        let mut candidates = Vec::new();
+        let mut translations = Vec::new();
         for chunk in self.monomers.chunks(3).filter(|c| c.len() == 3) {
             let codon = Codon(chunk[0], chunk[1], chunk[2]);
             let aminoacid = codon.aminoacid();
