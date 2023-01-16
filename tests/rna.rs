@@ -18,6 +18,20 @@ fn translate() {
     assert_eq!(actual, expected);
 }
 
+#[test]
+fn reading_frames() {
+    let rna = new_rna("AGGUGACACCGCAAGCCUUAUAUUAGCA");
+    let mut actual = rna.reading_frames();
+    let mut expected = [
+        new_rna("AGGUGACACCGCAAGCCUUAUAUUAGC"),
+        new_rna("GGUGACACCGCAAGCCUUAUAUUAGCA"),
+        new_rna("GUGACACCGCAAGCCUUAUAUUAG"),
+    ];
+    actual.sort();
+    expected.sort();
+    assert_eq!(actual, expected);
+}
+
 fn new_rna(symbols: &str) -> Rna {
     Polymer::new(symbols, RnaNucleotide::new).unwrap()
 }

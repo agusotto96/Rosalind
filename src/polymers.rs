@@ -191,9 +191,26 @@ impl Rna {
         }
         translations
             .iter()
-            .map(|t| Polymer {
-                monomers: t.to_vec(),
-            })
+            .map(|t| t.to_vec())
+            .map(|monomers| Polymer { monomers })
+            .collect()
+    }
+    pub fn reading_frames(&self) -> Vec<Rna> {
+        let mut frames = Vec::new();
+        for i in 0..=2 {
+            if self.monomers.len() > i {
+                let frame = self.monomers[i..]
+                    .chunks(3)
+                    .filter(|c| c.len() == 3)
+                    .flat_map(|c| c.to_vec())
+                    .collect::<Vec<RnaNucleotide>>();
+                frames.push(frame);
+            }
+        }
+        frames
+            .iter()
+            .map(|f| f.to_vec())
+            .map(|monomers| Polymer { monomers })
             .collect()
     }
 }
