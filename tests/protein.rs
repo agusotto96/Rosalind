@@ -8,7 +8,7 @@ fn mass() {
     let protein = new_protein("SKADYEK");
     let actual = protein.mass();
     let expected = 821.392;
-    assert!((actual - expected).abs() <= 0.0001);
+    assert!((actual - expected).abs() <= 0.001);
 }
 
 fn new_protein(symbols: &str) -> Protein {

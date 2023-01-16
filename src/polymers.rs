@@ -139,6 +139,21 @@ impl<N: Nucleotide> Polymer<N> {
             .collect();
         Polymer { monomers }
     }
+    pub fn transition_transversion_ratio(&self, other: &Self) -> f64 {
+        let mut transition = 0.0;
+        let mut transversion = 0.0;
+        for nucleotides in self.monomers.iter().zip(other.monomers.iter()) {
+            let (self_nucleotide, other_nucleotide) = nucleotides;
+            if self_nucleotide != other_nucleotide {
+                if self_nucleotide.is_purine() == other_nucleotide.is_purine() {
+                    transition += 1.0;
+                } else {
+                    transversion += 1.0;
+                }
+            }
+        }
+        transition / transversion
+    }
 }
 
 //-------------------------------------- DNA -----------------------------------------//
@@ -172,16 +187,16 @@ impl Rna {
     pub fn translate(&self) -> Vec<Protein> {
         let mut candidates = Vec::new();
         let mut translations = Vec::new();
-        for chunk in self.monomers.chunks(3).filter(|c| c.len() == 3) {
+        let chunks = self.monomers.chunks(3).filter(|c| c.len() == 3);
+        for chunk in chunks {
             let codon = Codon(chunk[0], chunk[1], chunk[2]);
-            let aminoacid = codon.aminoacid();
-            match aminoacid {
-                Some(a) => {
-                    if a.is_start() {
+            match codon.aminoacid() {
+                Some(aminoacid) => {
+                    if aminoacid.is_start() {
                         candidates.push(Vec::new());
                     }
                     for canidate in &mut candidates {
-                        canidate.push(a);
+                        canidate.push(aminoacid);
                     }
                 }
                 None => {

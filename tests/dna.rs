@@ -88,7 +88,7 @@ fn gc_content() {
     );
     let actual = dna.gc_content();
     let expected = 60.91954;
-    assert!((actual - expected).abs() <= 0.0001);
+    assert!((actual - expected).abs() <= 0.00001);
 }
 
 #[test]
@@ -105,6 +105,18 @@ fn transcribe() {
     let actual = dna.transcribe();
     let expected = new_rna("GAUGGAACUUGACUACGUAAAUU");
     assert_eq!(actual, expected);
+}
+
+#[test]
+fn transition_transversion_ratio() {
+    let dna = new_dna(
+        "GCAACGCACAACGAAAACCCTTAGGGACTGGATTATTTCGTGATCGTTGTAGTTATTGGAAGTACGGGCATCAACCCAGTT",
+    );
+    let actual = dna.transition_transversion_ratio(&new_dna(
+        "TTATCTGACAAAGAAAGCCGTCAACGGCTGGATAATTTCGCGATCGTGCTGGTTACTGGCGGTACGAGTGTTCCTTTGGGT",
+    ));
+    let expected = 1.21428571429;
+    assert!((actual - expected).abs() <= 0.00000000001);
 }
 
 fn new_dna(symbols: &str) -> Dna {

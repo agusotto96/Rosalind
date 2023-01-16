@@ -12,6 +12,8 @@ pub trait Monomer: Sized + PartialEq + Eq + Hash + Copy + Clone + Ord + PartialO
 pub trait Nucleotide: Monomer {
     fn complement(&self) -> Self;
     fn is_gc(&self) -> bool;
+    fn is_purine(&self) -> bool;
+    fn is_pyrimidine(&self) -> bool;
 }
 
 //--------------------------------- DNA NUCLEOTIDE -----------------------------------//
@@ -47,6 +49,12 @@ impl Nucleotide for DnaNucleotide {
     }
     fn is_gc(&self) -> bool {
         matches!(&self, DnaNucleotide::Guanine | DnaNucleotide::Cytosine)
+    }
+    fn is_purine(&self) -> bool {
+        matches!(&self, DnaNucleotide::Adenine | DnaNucleotide::Guanine)
+    }
+    fn is_pyrimidine(&self) -> bool {
+        matches!(&self, DnaNucleotide::Cytosine | DnaNucleotide::Thymine)
     }
 }
 
@@ -94,6 +102,12 @@ impl Nucleotide for RnaNucleotide {
     }
     fn is_gc(&self) -> bool {
         matches!(&self, RnaNucleotide::Guanine | RnaNucleotide::Cytosine)
+    }
+    fn is_purine(&self) -> bool {
+        matches!(&self, RnaNucleotide::Adenine | RnaNucleotide::Guanine)
+    }
+    fn is_pyrimidine(&self) -> bool {
+        matches!(&self, RnaNucleotide::Cytosine | RnaNucleotide::Uracil)
     }
 }
 
