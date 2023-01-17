@@ -36,24 +36,19 @@ impl<M: Monomer> Polymer<M> {
         count
     }
     pub fn hamming_distance(&self, other: &Self) -> usize {
-        let mut distance = 0;
-        for monomers in self.monomers.iter().zip(other.monomers.iter()) {
-            let (self_monomer, other_monomer) = monomers;
-            if self_monomer != other_monomer {
-                distance += 1;
-            }
-        }
-        distance
+        self.monomers
+            .iter()
+            .zip(other.monomers.iter())
+            .filter(|p| p.0 != p.1)
+            .count()
     }
     pub fn motif_locations(&self, motif: &Self) -> Vec<usize> {
-        let mut locations = Vec::new();
-        for (i, subpolymer) in self.monomers.windows(motif.monomers.len()).enumerate() {
-            if subpolymer == motif.monomers {
-                let location = i + 1;
-                locations.push(location);
-            }
-        }
-        locations
+        self.monomers
+            .windows(motif.monomers.len())
+            .enumerate()
+            .filter(|e| e.1 == motif.monomers)
+            .map(|e| e.0 + 1)
+            .collect()
     }
     pub fn profile(polymers: &[Polymer<M>]) -> HashMap<M, Vec<usize>> {
         let mut profile = HashMap::new();
@@ -187,7 +182,7 @@ impl Rna {
     pub fn translate(&self) -> Vec<Protein> {
         let mut candidates = Vec::new();
         let mut translations = Vec::new();
-        let chunks = self.monomers.chunks(3).filter(|c| c.len() == 3);
+        let chunks = self.monomers.chunks_exact(3);
         for chunk in chunks {
             let codon = Codon(chunk[0], chunk[1], chunk[2]);
             match codon.aminoacid() {
@@ -215,8 +210,7 @@ impl Rna {
         for i in 0..=2 {
             if self.monomers.len() > i {
                 let frame = self.monomers[i..]
-                    .chunks(3)
-                    .filter(|c| c.len() == 3)
+                    .chunks_exact(3)
                     .flat_map(|c| c.to_vec())
                     .collect::<Vec<RnaNucleotide>>();
                 frames.push(frame);
