@@ -199,18 +199,15 @@ impl Rna {
         let mut frames = Vec::new();
         for i in 0..=2 {
             if self.monomers.len() > i {
-                let frame = self.monomers[i..]
+                let monomers = self.monomers[i..]
                     .chunks_exact(3)
                     .flat_map(|c| c.to_vec())
                     .collect::<Vec<RnaNucleotide>>();
+                let frame = Polymer { monomers };
                 frames.push(frame);
             }
         }
         frames
-            .iter()
-            .map(|f| f.to_vec())
-            .map(|monomers| Polymer { monomers })
-            .collect()
     }
 }
 
