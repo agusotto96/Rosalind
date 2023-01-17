@@ -91,29 +91,19 @@ impl<M: Monomer> Polymer<M> {
                     if i == shortest_i {
                         continue;
                     }
-                    if !polymer.contains_motif(&Polymer {
-                        monomers: motif.to_vec(),
-                    }) {
+                    if !polymer.monomers.windows(motif.len()).any(|s| s == motif) {
                         shared = false;
                         break;
                     }
                 }
                 if shared {
-                    return Some(Polymer {
-                        monomers: motif.to_vec(),
-                    });
+                    let monomers = motif.to_vec();
+                    let polymer = Polymer { monomers };
+                    return Some(polymer);
                 }
             }
         }
         None
-    }
-    pub fn contains_motif(&self, motif: &Self) -> bool {
-        for subpolymer in self.monomers.windows(motif.monomers.len()) {
-            if subpolymer == motif.monomers {
-                return true;
-            }
-        }
-        false
     }
 }
 
